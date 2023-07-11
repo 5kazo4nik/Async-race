@@ -4,10 +4,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width">
-  <title>Document</title>
+  <title>async-race</title>
 </head>
 
 <body>
+  <header>
+    <div class="btn btn_garage">To garage</div>
+    <div class="btn btn_winners">To winners</div>
+  </header>
+
+  <main>
+    <div class="inputs">
+      <div class="inputs__create">
+        <input type="text" class="input input_create">
+        <div class="colorizer"></div>
+        <div class="btn btn_create">Create</div>
+      </div>
+      <div class="inputs__update">
+        <input disabled type="text" class="input input__update">
+        <div class="colorizer"></div>
+        <div class="btn btn_update">Update</div>
+      </div>
+      <div class="inputs__opt">
+        <div class="btn btn_race">Race</div>
+        <div class="btn btn_reset">Reset</div>
+        <div class="btn btn_generate">Generate Cars</div>
+      </div>
+    </div>
+
+    <div class="garage">
+      <h2 class="garage__header">Garage (2)</h2>
+      <h3 class="garage__pages">Page #1</h3>
+      <div class="car">
+        <div class="car__opt">
+          <div class="btn btn_select">select</div>
+          <div class="btn btn_remove">remove</div>
+          <p class="car__name">Tesla</p>
+        </div>
+        <div class="car__engine">
+          <div class="car__start">A</div>
+          <div class="car__stop inactive">B</div>
+        </div>
+        <div class="car__road">
+          <embed src="./assets/svg/car_gdhlhrosi4v1.svg" type="image/svg+xml" class="car__instance"></embed>
+          <div class="car__flag"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="winners">
+      <h2 class="winners__header">Winners (1)</h2>
+      <h3 class="winners__pages">Page #1</h3>
+
+      <div class="winners__table table">
+        <div class="table__number">
+          <div class="table__head">Number</div>
+          <div class="win-number">1</div>
+        </div>
+        <div class="table__car">
+          <div class="table__head">Car</div>
+          <div class="win-car">...</div>
+        </div>
+        <div class="table__name">
+          <div class="table__head">Name</div>
+          <div class="win-name">Tesla</div>
+        </div>
+        <div class="table__wins">
+          <div class="table__head">Wins</div>
+          <div class="win-count">1</div>
+        </div>
+        <div class="table__time">
+          <div class="table__head">Best time (seconds)</div>
+          <div class="win-time">10</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="btn btn_prev">Prev</div>
+    <div class="btn btn_next">Next</div>
+  </footer>
 
 </body>
 

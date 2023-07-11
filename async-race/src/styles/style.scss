@@ -1,0 +1,240 @@
+html {
+  font-size: 10px;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  background-color: rgb(181, 184, 177);
+}
+
+input {
+  outline: none;
+}
+
+h2 {
+  font-size: 2.2rem;
+}
+
+h3 {
+  font-size: 1.6rem;
+}
+
+.btn {
+  width: fit-content;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 3px 5px;
+  border-width: 1px 1px 3px 1px;
+  border-style: solid;
+  cursor: pointer;
+}
+
+.btn.inactive {
+  border-color: rgb(109, 109, 109);
+  background-color: rgb(110, 110, 110);
+  cursor: default;
+}
+
+header {
+  padding: 10px 0 40px 10px;
+}
+
+header,
+footer {
+  display: flex;
+  column-gap: 15px;
+}
+
+footer {
+  padding: 40px 0 10px 10px;
+}
+
+.btn_garage,
+.btn_winners,
+.btn_prev,
+.btn_next {
+  border-color: rgb(0, 150, 0);
+  background-color: rgb(146, 177, 100);
+}
+
+.btn_garage,
+.btn_winners,
+.btn_prev,
+.btn_next {
+  border-color: rgb(0, 150, 0);
+  background-color: rgb(146, 177, 100);
+}
+
+// //////////////  inputs
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  row-gap: 15px;
+  margin-left: 5px;
+  padding-bottom: 50px;
+}
+
+.inputs__create,
+.inputs__update {
+  display: flex;
+  column-gap: 5px;
+}
+
+.btn_create,
+.btn_update,
+.btn_generate {
+  border-color: rgb(66, 66, 255);
+  background-color: rgb(157, 157, 255);
+}
+
+.inputs__opt {
+  display: flex;
+  column-gap: 5px;
+}
+
+.btn_race,
+.btn_reset {
+  border-color: rgb(0, 192, 0);
+  background-color: rgb(195, 247, 117);
+}
+
+// /////////////////// garage
+
+.garage__header,
+.winners__header {
+  margin: 0 0 20px 5px;
+}
+
+.garage__pages,
+.winners__pages {
+  margin: 0 0 10px 5px;
+}
+
+.car {
+  margin-bottom: 10px;
+}
+
+.car__opt {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.btn_select,
+.btn_remove {
+  border-color: rgb(145, 145, 255);
+  background-color: rgb(186, 186, 252);
+  margin-left: 5px;
+}
+
+.car__name {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: rgb(151, 43, 0);
+  margin: 0 0 0 15px;
+}
+
+.car__engine {
+  display: flex;
+  margin-bottom: 40px;
+}
+
+.car__start,
+.car__stop {
+  width: 21px;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-left: 5px;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    border-color: rgb(77, 77, 253);
+    color: rgb(77, 77, 253);
+  }
+}
+
+.car__start {
+  border-color: green;
+  color: green;
+}
+
+.car__stop {
+  border-color: red;
+  color: red;
+}
+
+.car__start.inactive,
+.car__stop.inactive {
+  border-color: gray;
+  color: gray;
+  cursor: default;
+}
+
+.car__road {
+  border-bottom: 4px dashed black;
+  position: relative;
+}
+
+.car__instance,
+.car__flag {
+  position: absolute;
+}
+
+.car__instance {
+  object-fit: cover;
+  width: 75px;
+  height: 75px;
+  left: 20px;
+  top: -50px;
+}
+
+.car__flag {
+  width: 20px;
+  height: 40px;
+  right: 120px;
+  top: -40px;
+  background-image: url('../assets/svg/finish-line-flag-svgrepo-com.svg');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+// ///////////////////////////// table
+
+.table {
+  display: flex;
+  margin-left: 5px;
+  font-size: 1.6rem;
+}
+
+.table__number,
+.table__car,
+.table__name,
+.table__wins,
+.table__time {
+  text-align: left;
+}
+
+.table__head {
+  padding: 2px 4px;
+  background-color: rgb(77, 77, 253);
+  font-weight: bold;
+}
+
+.win-number,
+.win-car,
+.win-name,
+.win-count,
+.win-time {
+  padding-top: 2px;
+}
