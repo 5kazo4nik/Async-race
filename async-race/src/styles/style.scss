@@ -104,7 +104,17 @@ footer {
   background-color: rgb(195, 247, 117);
 }
 
+.colorizer {
+  width: 40px;
+  height: 22px;
+}
+
 // /////////////////// garage
+
+.garage.inactive,
+.winners.inactive {
+  display: none;
+}
 
 .garage__header,
 .winners__header {
