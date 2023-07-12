@@ -29,6 +29,16 @@ module.exports = (env, options) => {
       ignored: /node_modules/,
     },
     optimization: optimization(),
+    devServer: {
+      historyApiFallback: true,
+      static: {
+        directory: path.resolve(__dirname, 'source'),
+      },
+      open: true,
+      compress: true,
+      hot: true,
+      port: 3000,
+    },
     entry: './src/scripts/index.ts',
     output: {
       path: path.resolve(__dirname, '../dist'),
