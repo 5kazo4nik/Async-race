@@ -1,5 +1,6 @@
 import { EventEmitter } from '../emitter/emitter';
-import { CarData } from '../types/carDataType';
+import { CarData } from '../types/dataTypes';
+import { createSvg } from '../util/createSvg';
 import { Creator } from './creator';
 
 export class CarCreator extends Creator {
@@ -36,26 +37,8 @@ export class CarCreator extends Creator {
     this.btnStop = Creator.renderElem(this.carEngine, 'div', ['car__stop', 'inactive'], 'B');
 
     this.carRoad = Creator.renderElem(this.carWrapper, 'div', ['car__road']);
-    this.carSvg = CarCreator.createSvg(this.color);
+    this.carSvg = createSvg(this.color, ['car__instance']);
     this.carRoad.append(this.carSvg);
     this.carFlag = Creator.renderElem(this.carRoad, 'div', ['car__flag']);
-  }
-
-  private static createSvg(color: string): HTMLElement {
-    const svgObject = document.createElement('object');
-
-    svgObject.data = './img/car_gdhlhrosi4v1..svg';
-    svgObject.type = 'image/svg+xml';
-    svgObject.classList.add('car__instance');
-
-    svgObject.onload = (): void => {
-      const svgDoc = svgObject.contentDocument;
-      if (!svgDoc) return;
-      const svgElement = svgDoc.querySelector('svg');
-      if (!svgElement) return;
-      const path = svgElement.querySelector<SVGPathElement>('.true-fill');
-      if (path) path.style.fill = color;
-    };
-    return svgObject;
   }
 }

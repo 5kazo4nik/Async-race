@@ -1,5 +1,5 @@
-import { ApiQuery } from '../api/apiGarage';
-import { CarData } from '../types/carDataType';
+import { ApiQuery } from '../api/apiQuery';
+import { CarData } from '../types/dataTypes';
 import { CarCreator } from './carCreator';
 import { Creator } from './creator';
 import { RouteCreator } from './routeCreator';
