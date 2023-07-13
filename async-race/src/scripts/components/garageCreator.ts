@@ -1,3 +1,6 @@
+import { ApiQuery } from '../api/apiGarage';
+import { CarData } from '../types/carDataType';
+import { CarCreator } from './carCreator';
 import { Creator } from './creator';
 import { RouteCreator } from './routeCreator';
 
@@ -20,10 +23,12 @@ export class GarageCreator extends RouteCreator {
   private garageTitle!: HTMLElement;
   private garagePage!: HTMLElement;
 
+  private cars: CarCreator[] = [];
+
   public render(parent: HTMLElement): void {
     super.render(parent);
-    this.inputs = Creator.renderElem(this.container, 'div', ['inputs']);
 
+    this.inputs = Creator.renderElem(this.container, 'div', ['inputs']);
     this.inputsCreate = Creator.renderElem(this.inputs, 'div', ['inputs__create']);
     this.inputCreate = Creator.renderElem(this.inputsCreate, 'input', ['input', 'input_create'], null, 'text');
     this.createColorizer = Creator.renderElem(this.inputsCreate, 'input', ['colorizer'], null, 'color');
@@ -43,5 +48,17 @@ export class GarageCreator extends RouteCreator {
     this.garage = Creator.renderElem(this.container, 'div', ['garage__header']);
     this.garageTitle = Creator.renderElem(this.garage, 'h2', ['garage__header'], 'Garage');
     this.garagePage = Creator.renderElem(this.garage, 'h3', ['garage__pages'], 'Page');
+
+    ApiQuery.getAll<CarData>(this.url).then((carItems) => this.renderCars(carItems));
+  }
+
+  private renderCars(cars: CarData[]): void {
+    this.cars = [];
+
+    cars.forEach((car) => {
+      const carInstance = new CarCreator(this.emitter, car);
+      carInstance.render(this.garage);
+      this.cars.push(carInstance);
+    });
   }
 }

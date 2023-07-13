@@ -1,4 +1,6 @@
-export abstract class RouteCreator {
+import { Creator } from './creator';
+
+export abstract class RouteCreator extends Creator {
   public abstract url: string;
 
   private parent!: HTMLElement;

@@ -3,7 +3,7 @@ import { FooterCreator } from '../components/footerCreator';
 import { HeaderCreator } from '../components/headerCreator';
 import { RouteCreator } from '../components/routeCreator';
 import { ROUTS } from '../data/routes';
-import { IRoute } from '../data/types';
+import { IRoute } from '../types/RouteType';
 
 export class AppCreator extends Creator {
   private container = document.body;
@@ -14,7 +14,7 @@ export class AppCreator extends Creator {
 
   public render(): void {
     ROUTS.forEach((route: IRoute) => {
-      const Component = new route.Component();
+      const Component = new route.Component(this.emitter);
       Component.render(this.container);
       this.windows.push(Component);
     });

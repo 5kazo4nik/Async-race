@@ -1,6 +1,6 @@
 import { GarageCreator } from '../components/garageCreator';
 import { WinnersCreator } from '../components/winnersCreator';
-import { Routs } from './types';
+import { Routs } from '../types/RouteType';
 
 export const ROUTS: Routs = [
   {

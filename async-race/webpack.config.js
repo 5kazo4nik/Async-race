@@ -37,7 +37,7 @@ module.exports = (env, options) => {
       open: true,
       compress: true,
       hot: true,
-      port: 3000,
+      port: 9000,
     },
     entry: './src/scripts/index.ts',
     output: {

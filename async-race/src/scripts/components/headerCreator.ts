@@ -1,5 +1,5 @@
-import { IRoute, Routs } from '../data/types';
 import { EventEmitter } from '../emitter/emitter';
+import { IRoute, Routs } from '../types/RouteType';
 import { Creator } from './creator';
 
 export class HeaderCreator extends Creator {
