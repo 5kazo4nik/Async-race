@@ -246,7 +246,11 @@ footer {
 .win-name,
 .win-count,
 .win-time {
-  padding-top: 2px;
+  padding: 2px 10px 0 4px;
+}
+
+.win-car {
+  height: 18px;
 }
 
 .table__img {

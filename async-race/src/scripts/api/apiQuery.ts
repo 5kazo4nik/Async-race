@@ -18,6 +18,6 @@ export class ApiQuery {
   }
 
   public static update<T>(endpoint: string, id: number, data: T): Promise<T> {
-    return ApiMethods.patch(`${endpoint}/${id}`, data);
+    return ApiMethods.put(`${endpoint}/${id}`, data);
   }
 }

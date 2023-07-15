@@ -1,4 +1,4 @@
-export function createSvg(color: string, classes?: string[]): HTMLElement {
+export function createSvg(color: string, classes?: string[]): HTMLObjectElement {
   const svgObject = document.createElement('object');
 
   svgObject.data = './img/car_gdhlhrosi4v1..svg';

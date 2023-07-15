@@ -4,7 +4,7 @@ import { EventEmitter } from '../emitter/emitter';
 export abstract class Creator {
   constructor(protected readonly emitter: EventEmitter) {}
 
-  public static renderElem(parent: HTMLElement, tag: string, classes?: string[], text?: string | null, type?: string): HTMLElement {
+  public static renderElem(parent: HTMLElement, tag: string, classes?: string[], text?: string | null, type?: string): HTMLElement | HTMLInputElement {
     const elem = document.createElement(tag);
     if (classes) elem.classList.add(...classes);
     if (text) elem.textContent = text;
