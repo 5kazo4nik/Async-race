@@ -52,7 +52,6 @@ export class CarCreator extends Creator {
 
   private deleteCar(): void {
     this.carWrapper.remove();
-    ApiQuery.delete('winners', this.id);
     ApiQuery.delete('garage', this.id);
     this.emitter.emit('deleteCar', this.id);
   }

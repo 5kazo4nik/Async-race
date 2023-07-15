@@ -52,6 +52,7 @@ export class WinnersCreator extends RouteCreator {
     this.emitter.subscribe<number>('deleteCar', (id) => {
       const deletedCar = this.carsRes.find((car) => car.id === id);
       if (deletedCar) {
+        ApiQuery.delete('winners', id);
         this.removeTableElems();
         const index = this.carsRes.indexOf(deletedCar);
         this.carsRes.splice(index, 1);
