@@ -6,7 +6,8 @@ import { ROUTS } from '../data/routes';
 import { IRoute } from '../types/RouteType';
 
 export class AppCreator extends Creator {
-  private container = document.body;
+  private body = document.body;
+  private main = document.createElement('main');
   private header = new HeaderCreator(this.emitter, ROUTS);
   private footer = new FooterCreator(this.emitter);
   private windows: RouteCreator[] = [];
@@ -15,14 +16,15 @@ export class AppCreator extends Creator {
   public render(): void {
     ROUTS.forEach((route: IRoute) => {
       const Component = new route.Component(this.emitter);
-      Component.render(this.container);
+      Component.render(this.main);
       this.windows.push(Component);
     });
 
     this.emitter.subscribe('changeRoute', (route: IRoute) => this.changeRoute(route));
 
-    this.header.render(this.container);
-    this.footer.render(this.container);
+    this.header.render(this.body);
+    this.body.append(this.main);
+    this.footer.render(this.body);
   }
 
   private changeRoute(route: IRoute): void {
@@ -37,7 +39,7 @@ export class AppCreator extends Creator {
   private updateFooter(activeWindow: RouteCreator): void {
     const index = this.windows.indexOf(activeWindow);
     if (index !== this.curWindowIndex) {
-      this.footer.update(this.container);
+      this.footer.update(this.body);
       this.curWindowIndex = index;
     }
   }

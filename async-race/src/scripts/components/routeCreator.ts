@@ -9,20 +9,22 @@ export abstract class RouteCreator extends Creator {
 
   public render(parent: HTMLElement): void {
     this.parent = parent;
-    this.container = document.createElement('main');
+    this.container = document.createElement('div');
+    this.container.classList.add('window-wrapper', 'inactive');
+    this.parent.append(this.container);
   }
 
   public show(): void {
     if (!this.isShown) {
       this.isShown = true;
-      this.parent.append(this.container);
+      this.container.classList.remove('inactive');
     }
   }
 
   public hide(): void {
     if (this.isShown) {
       this.isShown = false;
-      this.container.remove();
+      this.container.classList.add('inactive');
     }
   }
 }

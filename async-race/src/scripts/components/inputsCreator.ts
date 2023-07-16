@@ -1,6 +1,7 @@
 import { ApiQuery } from '../api/apiQuery';
 import { EventEmitter } from '../emitter/emitter';
 import { CarData } from '../types/dataTypes';
+import { RandomGenerator } from '../util/randomGeneration';
 import { Creator } from './creator';
 
 export class InputsCreator extends Creator {
@@ -49,6 +50,7 @@ export class InputsCreator extends Creator {
   private bindEvents(): void {
     this.btnCreate.addEventListener('click', () => this.createCar());
     this.btnUpdate.addEventListener('click', () => this.updateCar());
+    this.btnGenerate.addEventListener('click', () => this.generateCar());
   }
 
   private subscribeEvents(): void {
@@ -88,5 +90,13 @@ export class InputsCreator extends Creator {
       this.selectedCar = null;
       this.inputUpdate.disabled = true;
     }
+  }
+
+  private async generateCar(): Promise<void> {
+    const randomCars = RandomGenerator.generateCarsData();
+    const promises = randomCars.map((car) => ApiQuery.create('garage', car));
+    const carsData = await Promise.all(promises);
+
+    this.emitter.emit('generateCars', carsData);
   }
 }

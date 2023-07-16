@@ -31,7 +31,7 @@ export class GarageCreator extends RouteCreator {
 
   private subscribeEvents(): void {
     this.emitter.subscribe('createCar', (carData: CarData) => {
-      this.renderCars(carData);
+      this.renderCar(carData);
     });
 
     this.emitter.subscribe('deleteCar', (id: number) => {
@@ -49,22 +49,22 @@ export class GarageCreator extends RouteCreator {
         updatedCar.updateCar(data);
       }
     });
+
+    this.emitter.subscribe<CarData[]>('generateCars', (data) => {
+      data.forEach((car) => this.renderCar(car));
+    });
   }
 
-  private renderCars(carData: CarData[] | CarData): void {
-    const renderCar = (car: CarData): void => {
-      const carInstance = new CarCreator(this.emitter, car);
-      carInstance.render(this.garage);
-      this.cars.push(carInstance);
-    };
+  private renderCars(carData: CarData[]): void {
+    this.cars = [];
+    carData.forEach((car) => {
+      this.renderCar(car);
+    });
+  }
 
-    if (Array.isArray(carData)) {
-      this.cars = [];
-      carData.forEach((car) => {
-        renderCar(car);
-      });
-    } else {
-      renderCar(carData);
-    }
+  private renderCar(car: CarData): void {
+    const carInstance = new CarCreator(this.emitter, car);
+    carInstance.render(this.garage);
+    this.cars.push(carInstance);
   }
 }

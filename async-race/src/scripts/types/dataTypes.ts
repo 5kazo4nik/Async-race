@@ -1,11 +1,11 @@
 export type CarData = {
-  id: number;
-  name: string;
-  color: string;
+  readonly id: number;
+  readonly name: string;
+  readonly color: string;
 };
 
 export type ResultData = {
-  id: number;
-  wins: number;
-  time: number;
+  readonly id: number;
+  readonly wins: number;
+  readonly time: number;
 };

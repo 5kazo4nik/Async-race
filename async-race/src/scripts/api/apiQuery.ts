@@ -1,3 +1,4 @@
+import { CarData } from '../types/dataTypes';
 import { ApiMethods } from './apiMethods';
 
 export class ApiQuery {
@@ -9,7 +10,7 @@ export class ApiQuery {
     return ApiMethods.get(`${endpoint}/${id}`);
   }
 
-  public static create<T>(endpoint: string, data: T): Promise<T> {
+  public static create<T>(endpoint: string, data: T): Promise<CarData> {
     return ApiMethods.post(`${endpoint}`, data);
   }
 
