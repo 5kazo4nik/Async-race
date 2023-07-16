@@ -11,7 +11,7 @@ export class AppCreator extends Creator {
   private header = new HeaderCreator(this.emitter, ROUTS);
   private footer = new FooterCreator(this.emitter);
   private windows: RouteCreator[] = [];
-  private curWindowIndex = 0;
+  private curWindowIndex: number | null = null;
 
   public render(): void {
     ROUTS.forEach((route: IRoute) => {
@@ -39,7 +39,7 @@ export class AppCreator extends Creator {
   private updateFooter(activeWindow: RouteCreator): void {
     const index = this.windows.indexOf(activeWindow);
     if (index !== this.curWindowIndex) {
-      this.footer.update(this.body);
+      this.footer.update(activeWindow.url);
       this.curWindowIndex = index;
     }
   }

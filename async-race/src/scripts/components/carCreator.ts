@@ -20,13 +20,14 @@ export class CarCreator extends Creator {
   public id = this.carData.id;
   private color = this.carData.color;
   private name = this.carData.name;
+  private isShown = false;
 
   constructor(protected emitter: EventEmitter, private carData: CarData) {
     super(emitter);
   }
 
   public render(parent: HTMLElement): void {
-    this.carWrapper = Creator.renderElem(parent, 'div', ['car']);
+    this.carWrapper = Creator.renderElem(parent, 'div', ['car', 'inactive']);
 
     this.carOpt = Creator.renderElem(this.carWrapper, 'div', ['car__opt']);
     this.btnSelect = Creator.renderElem(this.carOpt, 'div', ['btn', 'btn_select'], 'select');
@@ -67,5 +68,19 @@ export class CarCreator extends Creator {
     this.carSvg.replaceWith(newSvg);
     this.carSvg = newSvg;
     this.carName.textContent = this.name;
+  }
+
+  public show(): void {
+    if (!this.isShown) {
+      this.isShown = true;
+      this.carWrapper.classList.remove('inactive');
+    }
+  }
+
+  public hide(): void {
+    if (this.isShown) {
+      this.isShown = false;
+      this.carWrapper.classList.add('inactive');
+    }
   }
 }
