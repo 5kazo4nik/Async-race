@@ -1,7 +1,9 @@
 import { Creator } from '../components/creator';
 import { FooterCreator } from '../components/footerCreator';
+import { GarageCreator } from '../components/garageCreator';
 import { HeaderCreator } from '../components/headerCreator';
 import { RouteCreator } from '../components/routeCreator';
+import { WinnersCreator } from '../components/winnersCreator';
 import { ROUTS } from '../data/routes';
 import { IRoute } from '../types/RouteType';
 
@@ -33,7 +35,12 @@ export class AppCreator extends Creator {
     activeWindow?.show();
     inactiveWindow.forEach((window) => window.hide());
 
-    if (activeWindow) this.updateFooter(activeWindow);
+    if (activeWindow) {
+      this.updateFooter(activeWindow);
+      if (activeWindow instanceof GarageCreator || activeWindow instanceof WinnersCreator) {
+        activeWindow.setPageBtn();
+      }
+    }
   }
 
   private updateFooter(activeWindow: RouteCreator): void {

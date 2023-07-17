@@ -66,25 +66,24 @@ export class GarageCreator extends RouteCreator {
     const carInstance = new CarCreator(this.emitter, car);
     carInstance.render(this.garage);
     this.cars.push(carInstance);
-    this.updateCarsQuantity(this.cars.length);
-    this.setActiveCars();
+    this.updateTitleQuantity(this.cars.length);
+    this.setActiveElems();
   }
 
-  private updateCarsQuantity(num: number): void {
+  private updateTitleQuantity(num: number): void {
     this.garageTitle.textContent = `Garage (${num})`;
   }
 
-  private setActiveCars(): void {
-    const activeCars = this.getActiveCars();
+  private setActiveElems(): void {
+    const activeCars = this.getActiveElems();
     this.cars.forEach((car) => car.hide());
     activeCars.forEach((car) => car.show());
 
-    const end = this.quantity * this.page;
-    this.setPageBtn(end);
+    this.setPageBtn();
     this.updatePagesQuantity();
   }
 
-  private getActiveCars(): CarCreator[] {
+  private getActiveElems(): CarCreator[] {
     let activeCars;
     const end = this.quantity * this.page;
     const start = this.page === 1 ? 0 : end - this.quantity;
@@ -97,7 +96,8 @@ export class GarageCreator extends RouteCreator {
     return activeCars;
   }
 
-  private setPageBtn(end: number): void {
+  public setPageBtn(): void {
+    const end = this.quantity * this.page;
     if (this.page === 1) {
       this.emitter.emit('firstPage', this.url);
     } else {
@@ -120,14 +120,14 @@ export class GarageCreator extends RouteCreator {
   private prevPageListner(url: string): void {
     if (this.url === url) {
       this.page -= 1;
-      this.setActiveCars();
+      this.setActiveElems();
     }
   }
 
   private nextPageListner(url: string): void {
     if (this.url === url) {
       this.page += 1;
-      this.setActiveCars();
+      this.setActiveElems();
     }
   }
 
@@ -144,10 +144,10 @@ export class GarageCreator extends RouteCreator {
     if (deletedCar) {
       const index = this.cars.indexOf(deletedCar);
       this.cars.splice(index, 1);
-      this.updateCarsQuantity(this.cars.length);
-      this.setActiveCars();
+      this.updateTitleQuantity(this.cars.length);
+      this.setActiveElems();
 
-      const activeCars = this.getActiveCars();
+      const activeCars = this.getActiveElems();
       if (!activeCars.length && this.page > 1) {
         this.prevPageListner(this.url);
       }

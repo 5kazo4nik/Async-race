@@ -23,7 +23,10 @@ export class WinnersCreator extends RouteCreator {
   private tableHead!: HTMLElement;
 
   private carsRes: ResultData[] = [];
-  private resElems: HTMLElement[] = [];
+  private resElems: HTMLElement[][] = [];
+
+  private page = 1;
+  private quantity = 10;
 
   public render(parent: HTMLElement): void {
     super.render(parent);
@@ -44,33 +47,29 @@ export class WinnersCreator extends RouteCreator {
     this.tableTime = Creator.renderElem(this.table, 'div', ['table__time']);
     this.tableHead = Creator.renderElem(this.tableTime, 'div', ['table__head'], 'Best time (seconds)');
 
-    ApiQuery.getAll<ResultData>('winners').then((data) => this.renderResult(data));
+    ApiQuery.getAll<ResultData>('winners').then((data) => this.setResults(data));
     this.subscribeEvents();
   }
 
   private subscribeEvents(): void {
     this.emitter.subscribe<number>('deleteCar', (id) => {
-      const deletedCar = this.carsRes.find((car) => car.id === id);
-      if (deletedCar) {
-        ApiQuery.delete('winners', id);
-        this.removeTableElems();
-        const index = this.carsRes.indexOf(deletedCar);
-        this.carsRes.splice(index, 1);
-        this.renderResult(this.carsRes);
-      }
+      this.deleteCarListner(id);
     });
 
     this.emitter.subscribe('updateCar', (data: CarData) => {
-      const { id } = data;
-      const updatedCar = this.carsRes.find((car) => car.id === id);
-      if (updatedCar) {
-        this.removeTableElems();
-        this.renderResult(this.carsRes);
-      }
+      this.updateCarListner(data);
+    });
+
+    this.emitter.subscribe('nextPage', (url: string) => {
+      this.nextPageListner(url);
+    });
+
+    this.emitter.subscribe('prevPage', (url: string) => {
+      this.prevPageListner(url);
     });
   }
 
-  private renderResult(data: ResultData[]): void {
+  private setResults(data: ResultData[]): void {
     this.carsRes = [];
     this.resElems = [];
 
@@ -90,12 +89,98 @@ export class WinnersCreator extends RouteCreator {
         nameItem.textContent = name;
       });
 
-      this.resElems.push(numberItem, winsItem, timeItem, carItem, nameItem);
+      this.resElems.push([numberItem, winsItem, timeItem, carItem, nameItem]);
       this.carsRes.push(winner);
     });
+
+    this.updateTitleQuantity(this.carsRes.length);
+    this.setActiveElems();
+  }
+
+  private setActiveElems(): void {
+    this.hideTableElems();
+    const activeCars = this.getActiveElems();
+    activeCars.forEach((rowElems) => rowElems.forEach((el) => el.classList.remove('inactive')));
+
+    this.setPageBtn();
+    this.updatePagesQuantity();
+  }
+
+  private getActiveElems(): HTMLElement[][] {
+    let activeCars;
+    const end = this.quantity * this.page;
+    const start = this.page === 1 ? 0 : end - this.quantity;
+
+    if (this.resElems.length > this.quantity) {
+      activeCars = this.resElems.slice(start, end);
+    } else {
+      activeCars = this.resElems.slice(start);
+    }
+    return activeCars;
+  }
+
+  public setPageBtn(): void {
+    const end = this.quantity * this.page;
+    if (this.page === 1) {
+      this.emitter.emit('firstPage', this.url);
+    } else {
+      this.emitter.emit('notFirstPage', this.url);
+    }
+
+    if (this.carsRes.length > this.quantity) {
+      this.emitter.emit('notLastPage', this.url);
+    } else {
+      this.emitter.emit('lastPage', this.url);
+    }
+    const nextPageCars = this.carsRes.slice(end);
+    if (!nextPageCars.length) this.emitter.emit('lastPage', this.url);
+  }
+
+  private updateTitleQuantity(num: number): void {
+    this.winnersTitle.textContent = `Winners (${num})`;
+  }
+
+  private updatePagesQuantity(): void {
+    this.winnersPage.textContent = `Page #${this.page}`;
   }
 
   private removeTableElems(): void {
-    this.resElems.forEach((el) => el.remove());
+    this.resElems.forEach((rowElems) => rowElems.forEach((el) => el.remove));
+  }
+
+  private hideTableElems(): void {
+    this.resElems.forEach((rowElems) => rowElems.forEach((el) => el.classList.add('inactive')));
+  }
+
+  private deleteCarListner(id: number): void {
+    const deletedCar = this.carsRes.find((car) => car.id === id);
+    if (deletedCar) {
+      ApiQuery.delete('winners', id);
+      this.removeTableElems();
+      this.setResults(this.carsRes);
+    }
+  }
+
+  private updateCarListner(data: CarData): void {
+    const { id } = data;
+    const updatedCar = this.carsRes.find((car) => car.id === id);
+    if (updatedCar) {
+      this.removeTableElems();
+      this.setResults(this.carsRes);
+    }
+  }
+
+  private prevPageListner(url: string): void {
+    if (this.url === url) {
+      this.page -= 1;
+      this.setActiveElems();
+    }
+  }
+
+  private nextPageListner(url: string): void {
+    if (this.url === url) {
+      this.page += 1;
+      this.setActiveElems();
+    }
   }
 }
