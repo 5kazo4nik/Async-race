@@ -7,15 +7,14 @@ import { RouteCreator } from './routeCreator';
 
 export class GarageCreator extends RouteCreator {
   public url = 'garage';
+  public elems: CarCreator[] = [];
+  protected page = 1;
+  protected quantity = 7;
 
   private inputs!: HTMLElement;
   private garage!: HTMLElement;
-  private garageTitle!: HTMLElement;
-  private garagePage!: HTMLElement;
-
-  private cars: CarCreator[] = [];
-  private page = 1;
-  private quantity = 7;
+  protected garageTitle!: HTMLElement;
+  protected pageElem!: HTMLElement;
 
   public render(parent: HTMLElement): void {
     super.render(parent);
@@ -24,14 +23,14 @@ export class GarageCreator extends RouteCreator {
     inputsCreator.render(this.container);
 
     this.garage = Creator.renderElem(this.container, 'div', ['garage__header']);
-    this.garageTitle = Creator.renderElem(this.garage, 'h2', ['garage__header'], 'Garage');
-    this.garagePage = Creator.renderElem(this.garage, 'h3', ['garage__pages'], 'Page');
+    this.titleElem = Creator.renderElem(this.garage, 'h2', ['garage__header'], 'Garage');
+    this.pageElem = Creator.renderElem(this.garage, 'h3', ['garage__pages'], 'Page');
 
     ApiQuery.getAll<CarData>(this.url).then((carItems) => this.renderCars(carItems));
     this.subscribeEvents();
   }
 
-  private subscribeEvents(): void {
+  protected subscribeEvents(): void {
     this.emitter.subscribe('createCar', (carData: CarData) => {
       this.renderCar(carData);
     });
@@ -65,89 +64,37 @@ export class GarageCreator extends RouteCreator {
   private renderCar(car: CarData): void {
     const carInstance = new CarCreator(this.emitter, car);
     carInstance.render(this.garage);
-    this.cars.push(carInstance);
-    this.updateTitleQuantity(this.cars.length);
+    this.elems.push(carInstance);
+    this.updateTitleQuantity();
     this.setActiveElems();
   }
 
-  private updateTitleQuantity(num: number): void {
-    this.garageTitle.textContent = `Garage (${num})`;
-  }
-
-  private setActiveElems(): void {
-    const activeCars = this.getActiveElems();
-    this.cars.forEach((car) => car.hide());
+  protected setActiveElems(): void {
+    const activeCars = this.getActiveElems(this.elems);
+    this.elems.forEach((car) => car.hide());
     activeCars.forEach((car) => car.show());
 
-    this.setPageBtn();
+    this.setPageBtn(this.elems);
     this.updatePagesQuantity();
   }
 
-  private getActiveElems(): CarCreator[] {
-    let activeCars;
-    const end = this.quantity * this.page;
-    const start = this.page === 1 ? 0 : end - this.quantity;
-
-    if (this.cars.length > this.quantity) {
-      activeCars = this.cars.slice(start, end);
-    } else {
-      activeCars = this.cars.slice(start);
-    }
-    return activeCars;
-  }
-
-  public setPageBtn(): void {
-    const end = this.quantity * this.page;
-    if (this.page === 1) {
-      this.emitter.emit('firstPage', this.url);
-    } else {
-      this.emitter.emit('notFirstPage', this.url);
-    }
-
-    if (this.cars.length > this.quantity) {
-      this.emitter.emit('notLastPage', this.url);
-    } else {
-      this.emitter.emit('lastPage', this.url);
-    }
-    const nextPageCars = this.cars.slice(end);
-    if (!nextPageCars.length) this.emitter.emit('lastPage', this.url);
-  }
-
-  private updatePagesQuantity(): void {
-    this.garagePage.textContent = `Page #${this.page}`;
-  }
-
-  private prevPageListner(url: string): void {
-    if (this.url === url) {
-      this.page -= 1;
-      this.setActiveElems();
-    }
-  }
-
-  private nextPageListner(url: string): void {
-    if (this.url === url) {
-      this.page += 1;
-      this.setActiveElems();
-    }
-  }
-
-  private updateCarListner(data: CarData): void {
+  protected updateCarListner(data: CarData): void {
     const { id } = data;
-    const updatedCar = this.cars.find((car) => car.id === id);
+    const updatedCar = this.elems.find((car) => car.id === id);
     if (updatedCar) {
       updatedCar.updateCar(data);
     }
   }
 
-  private deleteCarListner(id: number): void {
-    const deletedCar = this.cars.find((car) => car.id === id);
+  protected deleteCarListner(id: number): void {
+    const deletedCar = this.elems.find((car) => car.id === id);
     if (deletedCar) {
-      const index = this.cars.indexOf(deletedCar);
-      this.cars.splice(index, 1);
-      this.updateTitleQuantity(this.cars.length);
+      const index = this.elems.indexOf(deletedCar);
+      this.elems.splice(index, 1);
+      this.updateTitleQuantity();
       this.setActiveElems();
 
-      const activeCars = this.getActiveElems();
+      const activeCars = this.getActiveElems(this.elems);
       if (!activeCars.length && this.page > 1) {
         this.prevPageListner(this.url);
       }

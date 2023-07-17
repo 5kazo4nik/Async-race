@@ -6,10 +6,14 @@ import { RouteCreator } from './routeCreator';
 
 export class WinnersCreator extends RouteCreator {
   public url = 'winners';
+  protected page = 1;
+  protected quantity = 10;
+  public elems: ResultData[] = [];
+  private resElems: HTMLElement[][] = [];
 
   private winners!: HTMLElement;
-  private winnersTitle!: HTMLElement;
-  private winnersPage!: HTMLElement;
+  protected titleElem!: HTMLElement;
+  protected pageElem!: HTMLElement;
   private table!: HTMLElement;
   private tableNumber!: HTMLElement;
   private numberHead!: HTMLElement;
@@ -22,18 +26,12 @@ export class WinnersCreator extends RouteCreator {
   private tableTime!: HTMLElement;
   private tableHead!: HTMLElement;
 
-  private carsRes: ResultData[] = [];
-  private resElems: HTMLElement[][] = [];
-
-  private page = 1;
-  private quantity = 10;
-
   public render(parent: HTMLElement): void {
     super.render(parent);
 
     this.winners = Creator.renderElem(this.container, 'div', ['winners']);
-    this.winnersTitle = Creator.renderElem(this.winners, 'h2', ['winners__header'], 'Winners');
-    this.winnersPage = Creator.renderElem(this.winners, 'h3', ['winners__pages'], 'Page');
+    this.titleElem = Creator.renderElem(this.winners, 'h2', ['winners__header'], 'Winners');
+    this.pageElem = Creator.renderElem(this.winners, 'h3', ['winners__pages'], 'Page');
 
     this.table = Creator.renderElem(this.winners, 'div', ['table']);
     this.tableNumber = Creator.renderElem(this.table, 'div', ['table__number']);
@@ -51,7 +49,7 @@ export class WinnersCreator extends RouteCreator {
     this.subscribeEvents();
   }
 
-  private subscribeEvents(): void {
+  protected subscribeEvents(): void {
     this.emitter.subscribe<number>('deleteCar', (id) => {
       this.deleteCarListner(id);
     });
@@ -70,7 +68,7 @@ export class WinnersCreator extends RouteCreator {
   }
 
   private setResults(data: ResultData[]): void {
-    this.carsRes = [];
+    this.elems = [];
     this.resElems = [];
 
     data.forEach((winner) => {
@@ -90,97 +88,47 @@ export class WinnersCreator extends RouteCreator {
       });
 
       this.resElems.push([numberItem, winsItem, timeItem, carItem, nameItem]);
-      this.carsRes.push(winner);
+      this.elems.push(winner);
     });
 
-    this.updateTitleQuantity(this.carsRes.length);
+    this.updateTitleQuantity();
     this.setActiveElems();
   }
 
-  private setActiveElems(): void {
+  protected setActiveElems(): void {
     this.hideTableElems();
-    const activeCars = this.getActiveElems();
+    const activeCars = this.getActiveElems(this.resElems);
     activeCars.forEach((rowElems) => rowElems.forEach((el) => el.classList.remove('inactive')));
 
-    this.setPageBtn();
+    this.setPageBtn(this.elems);
     this.updatePagesQuantity();
   }
 
-  private getActiveElems(): HTMLElement[][] {
-    let activeCars;
-    const end = this.quantity * this.page;
-    const start = this.page === 1 ? 0 : end - this.quantity;
-
-    if (this.resElems.length > this.quantity) {
-      activeCars = this.resElems.slice(start, end);
-    } else {
-      activeCars = this.resElems.slice(start);
-    }
-    return activeCars;
-  }
-
-  public setPageBtn(): void {
-    const end = this.quantity * this.page;
-    if (this.page === 1) {
-      this.emitter.emit('firstPage', this.url);
-    } else {
-      this.emitter.emit('notFirstPage', this.url);
-    }
-
-    if (this.carsRes.length > this.quantity) {
-      this.emitter.emit('notLastPage', this.url);
-    } else {
-      this.emitter.emit('lastPage', this.url);
-    }
-    const nextPageCars = this.carsRes.slice(end);
-    if (!nextPageCars.length) this.emitter.emit('lastPage', this.url);
-  }
-
-  private updateTitleQuantity(num: number): void {
-    this.winnersTitle.textContent = `Winners (${num})`;
-  }
-
-  private updatePagesQuantity(): void {
-    this.winnersPage.textContent = `Page #${this.page}`;
-  }
-
   private removeTableElems(): void {
-    this.resElems.forEach((rowElems) => rowElems.forEach((el) => el.remove));
+    this.resElems.forEach((rowElems) => rowElems.forEach((el) => el.remove()));
   }
 
   private hideTableElems(): void {
     this.resElems.forEach((rowElems) => rowElems.forEach((el) => el.classList.add('inactive')));
   }
 
-  private deleteCarListner(id: number): void {
-    const deletedCar = this.carsRes.find((car) => car.id === id);
-    if (deletedCar) {
-      ApiQuery.delete('winners', id);
-      this.removeTableElems();
-      this.setResults(this.carsRes);
-    }
-  }
-
-  private updateCarListner(data: CarData): void {
+  protected updateCarListner(data: CarData): void {
     const { id } = data;
-    const updatedCar = this.carsRes.find((car) => car.id === id);
+    const updatedCar = this.elems.find((car) => car.id === id);
     if (updatedCar) {
       this.removeTableElems();
-      this.setResults(this.carsRes);
+      this.setResults(this.elems);
     }
   }
 
-  private prevPageListner(url: string): void {
-    if (this.url === url) {
-      this.page -= 1;
-      this.setActiveElems();
-    }
-  }
-
-  private nextPageListner(url: string): void {
-    if (this.url === url) {
-      this.page += 1;
-      this.setActiveElems();
+  protected deleteCarListner(id: number): void {
+    const deletedCar = this.elems.find((car) => car.id === id);
+    if (deletedCar) {
+      const index = this.elems.indexOf(deletedCar);
+      this.elems.splice(index, 1);
+      ApiQuery.delete('winners', id);
+      this.removeTableElems();
+      this.setResults(this.elems);
     }
   }
 }

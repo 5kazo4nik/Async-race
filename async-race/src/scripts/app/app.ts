@@ -1,3 +1,4 @@
+import { CarCreator } from '../components/carCreator';
 import { Creator } from '../components/creator';
 import { FooterCreator } from '../components/footerCreator';
 import { GarageCreator } from '../components/garageCreator';
@@ -6,6 +7,7 @@ import { RouteCreator } from '../components/routeCreator';
 import { WinnersCreator } from '../components/winnersCreator';
 import { ROUTS } from '../data/routes';
 import { IRoute } from '../types/RouteType';
+import { ResultData } from '../types/dataTypes';
 
 export class AppCreator extends Creator {
   private body = document.body;
@@ -38,7 +40,7 @@ export class AppCreator extends Creator {
     if (activeWindow) {
       this.updateFooter(activeWindow);
       if (activeWindow instanceof GarageCreator || activeWindow instanceof WinnersCreator) {
-        activeWindow.setPageBtn();
+        activeWindow.setPageBtn<CarCreator | ResultData>(activeWindow.elems);
       }
     }
   }
