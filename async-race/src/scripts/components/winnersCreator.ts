@@ -10,6 +10,7 @@ export class WinnersCreator extends RouteCreator {
   protected quantity = 10;
   public elems: ResultData[] = [];
   private resElems: HTMLElement[][] = [];
+  private heads: HTMLElement[] = [];
 
   private winners!: HTMLElement;
   protected titleElem!: HTMLElement;
@@ -24,7 +25,7 @@ export class WinnersCreator extends RouteCreator {
   private tableWins!: HTMLElement;
   private winsHead!: HTMLElement;
   private tableTime!: HTMLElement;
-  private tableHead!: HTMLElement;
+  private timeHead!: HTMLElement;
 
   public render(parent: HTMLElement): void {
     super.render(parent);
@@ -37,16 +38,33 @@ export class WinnersCreator extends RouteCreator {
     this.tableNumber = Creator.renderElem(this.table, 'div', ['table__number']);
     this.numberHead = Creator.renderElem(this.tableNumber, 'div', ['table__head'], 'Number');
     this.tableCar = Creator.renderElem(this.table, 'div', ['table__car', 'Car']);
-    this.carHead = Creator.renderElem(this.tableCar, 'div', ['table__head', 'Car'], 'Car');
+    this.carHead = Creator.renderElem(this.tableCar, 'div', ['table__head'], 'Car');
     this.tableName = Creator.renderElem(this.table, 'div', ['table__name']);
     this.nameHead = Creator.renderElem(this.tableName, 'div', ['table__head'], 'Name');
     this.tableWins = Creator.renderElem(this.table, 'div', ['table__wins']);
-    this.winsHead = Creator.renderElem(this.tableWins, 'div', ['table__head'], 'Wins');
+    this.winsHead = Creator.renderElem(this.tableWins, 'div', ['table__head', 'btn_sort'], 'Wins');
     this.tableTime = Creator.renderElem(this.table, 'div', ['table__time']);
-    this.tableHead = Creator.renderElem(this.tableTime, 'div', ['table__head'], 'Best time (seconds)');
+    this.timeHead = Creator.renderElem(this.tableTime, 'div', ['table__head', 'btn_sort'], 'Best time (seconds)');
+
+    this.heads.push(this.numberHead, this.carHead, this.nameHead, this.winsHead, this.timeHead);
+    this.heads.forEach((el, index) => {
+      const head = el;
+      head.dataset.index = String(index);
+    });
 
     ApiQuery.getAll<ResultData>('winners').then((data) => this.setResults(data));
     this.subscribeEvents();
+    this.bindEvents();
+  }
+
+  private bindEvents(): void {
+    this.heads.forEach((head) => {
+      if (head.classList.contains('btn_sort')) {
+        head.addEventListener('click', () => {
+          this.sortListner(head);
+        });
+      }
+    });
   }
 
   protected subscribeEvents(): void {
@@ -67,6 +85,8 @@ export class WinnersCreator extends RouteCreator {
     });
   }
 
+  // //////////// methods
+
   private setResults(data: ResultData[]): void {
     this.elems = [];
     this.resElems = [];
@@ -75,10 +95,10 @@ export class WinnersCreator extends RouteCreator {
       const { id } = winner;
       const number = data.indexOf(winner) + 1;
       const numberItem = Creator.renderElem(this.tableNumber, 'div', ['win-number'], String(number));
-      const winsItem = Creator.renderElem(this.tableWins, 'div', ['win-count'], String(winner.wins));
-      const timeItem = Creator.renderElem(this.tableTime, 'div', ['win-time'], String(winner.time));
       const carItem = Creator.renderElem(this.tableCar, 'div', ['win-car']);
       const nameItem = Creator.renderElem(this.tableName, 'div', ['win-name']);
+      const winsItem = Creator.renderElem(this.tableWins, 'div', ['win-count'], String(winner.wins));
+      const timeItem = Creator.renderElem(this.tableTime, 'div', ['win-time'], String(winner.time));
 
       ApiQuery.get<CarData>('garage', id).then((car) => {
         const { name, color } = car;
@@ -87,7 +107,7 @@ export class WinnersCreator extends RouteCreator {
         nameItem.textContent = name;
       });
 
-      this.resElems.push([numberItem, winsItem, timeItem, carItem, nameItem]);
+      this.resElems.push([numberItem, carItem, nameItem, winsItem, timeItem]);
       this.elems.push(winner);
     });
 
@@ -130,5 +150,58 @@ export class WinnersCreator extends RouteCreator {
       this.removeTableElems();
       this.setResults(this.elems);
     }
+  }
+
+  // Sort
+
+  private sortListner(head: HTMLElement): void {
+    let status;
+    if (head.classList.contains('up')) {
+      status = 'down';
+    } else {
+      status = 'up';
+    }
+    this.removeSortStatus();
+    head.classList.add(status);
+    this.sortTable(Number(head.dataset.index), status);
+  }
+
+  private sortTable(index: number, status: string): void {
+    const sortedArr = this.resElems.sort((a, b) => {
+      const first = Number(a[index].textContent);
+      const second = Number(b[index].textContent);
+      if (Number.isNaN(first) || Number.isNaN(second)) return 0;
+      if (status === 'up') {
+        if (first > second) return 1;
+        if (first < second) return -1;
+      }
+      if (status === 'down') {
+        if (first < second) return 1;
+        if (first > second) return -1;
+      }
+      return 0;
+    });
+    this.removeTableElems();
+    this.setSortedResults(sortedArr);
+    this.setActiveElems();
+  }
+
+  private setSortedResults(data: HTMLElement[][]): void {
+    data.forEach((row, index) => {
+      const [number, image, name, wins, time] = row;
+      number.textContent = String(index + 1);
+
+      this.tableNumber.append(number);
+      this.tableCar.append(image);
+      this.tableName.append(name);
+      this.tableWins.append(wins);
+      this.tableTime.append(time);
+    });
+  }
+
+  private removeSortStatus(): void {
+    this.heads.forEach((head) => {
+      head.classList.remove('up', 'down');
+    });
   }
 }
