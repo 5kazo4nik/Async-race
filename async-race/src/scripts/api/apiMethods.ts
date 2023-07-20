@@ -24,8 +24,8 @@ export class ApiMethods {
     return this.fetch('POST', endpoint, body, { 'Content-Type': 'application/json' });
   }
 
-  public static patch<T>(endpoint: string, body: unknown): Promise<T> {
-    return this.fetch('PATCH', endpoint, body);
+  public static patch<T>(endpoint: string): Promise<T> {
+    return this.fetch('PATCH', endpoint);
   }
 
   public static put<T>(endpoint: string, body: unknown): Promise<T> {

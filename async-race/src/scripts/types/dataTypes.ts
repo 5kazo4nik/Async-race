@@ -5,7 +5,22 @@ export type CarData = {
 };
 
 export type ResultData = {
-  readonly id: number;
-  readonly wins: number;
-  readonly time: number;
+  id: number;
+  wins: number;
+  time: number;
+};
+
+export type EngineData = {
+  id: number;
+  flag: HTMLElement;
+  car: HTMLElement;
+  name: string;
+  readonly velocity: number;
+  readonly distance: number;
+};
+
+export type WinResults = {
+  id: number;
+  time: number;
+  name: string;
 };

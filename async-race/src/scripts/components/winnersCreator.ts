@@ -1,5 +1,6 @@
+/* eslint-disable no-param-reassign */
 import { ApiQuery } from '../api/apiQuery';
-import { CarData, ResultData } from '../types/dataTypes';
+import { CarData, ResultData, WinResults } from '../types/dataTypes';
 import { createSvg } from '../util/createSvg';
 import { Creator } from './creator';
 import { RouteCreator } from './routeCreator';
@@ -68,7 +69,7 @@ export class WinnersCreator extends RouteCreator {
   }
 
   protected subscribeEvents(): void {
-    this.emitter.subscribe<number>('deleteCar', (id) => {
+    this.emitter.subscribe('deleteCar', (id: number) => {
       this.deleteCarListner(id);
     });
 
@@ -82,6 +83,10 @@ export class WinnersCreator extends RouteCreator {
 
     this.emitter.subscribe('prevPage', (url: string) => {
       this.prevPageListner(url);
+    });
+
+    this.emitter.subscribe('winRace', (results: WinResults) => {
+      this.updateAfterWin(results);
     });
   }
 
@@ -132,6 +137,8 @@ export class WinnersCreator extends RouteCreator {
     this.resElems.forEach((rowElems) => rowElems.forEach((el) => el.classList.add('inactive')));
   }
 
+  // Car-changing
+
   protected updateCarListner(data: CarData): void {
     const { id } = data;
     const updatedCar = this.elems.find((car) => car.id === id);
@@ -152,15 +159,40 @@ export class WinnersCreator extends RouteCreator {
     }
   }
 
+  // Win-updating
+
+  private updateAfterWin({ id, time }: WinResults): void {
+    const curRes = this.elems.find((el) => id === el.id);
+    if (curRes) {
+      WinnersCreator.updateResult(curRes, id, time);
+    } else {
+      this.createNewResult(id, time);
+    }
+    this.removeTableElems();
+    this.setResults(this.elems);
+  }
+
+  private static updateResult(curRes: ResultData, id: number, time: number): void {
+    curRes.wins += 1;
+    const bestTime = Math.min(time, curRes.time);
+    curRes.time = bestTime;
+    ApiQuery.update('winners', id, { wins: curRes.wins, time: bestTime });
+  }
+
+  private createNewResult(id: number, time: number): void {
+    const newElem: ResultData = {
+      wins: 1,
+      id,
+      time,
+    };
+    this.elems.push(newElem);
+    ApiQuery.create('winners', newElem);
+  }
+
   // Sort
 
   private sortListner(head: HTMLElement): void {
-    let status;
-    if (head.classList.contains('up')) {
-      status = 'down';
-    } else {
-      status = 'up';
-    }
+    const status = head.classList.contains('up') ? 'down' : 'up';
     this.removeSortStatus();
     head.classList.add(status);
     this.sortTable(Number(head.dataset.index), status);

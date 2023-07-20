@@ -1,6 +1,8 @@
 import { CarData } from '../types/dataTypes';
 import { ApiMethods } from './apiMethods';
 
+type EngineStatus = 'started' | 'stopped' | 'drive';
+
 export class ApiQuery {
   public static getAll<T>(endpoint: string): Promise<T[]> {
     return ApiMethods.get(`${endpoint}`);
@@ -20,5 +22,9 @@ export class ApiQuery {
 
   public static update<T>(endpoint: string, id: number, data: T): Promise<T> {
     return ApiMethods.put(`${endpoint}/${id}`, data);
+  }
+
+  public static engine<T>(id: number, status: EngineStatus): Promise<T> {
+    return ApiMethods.patch(`engine?id=${id}&status=${status}`);
   }
 }

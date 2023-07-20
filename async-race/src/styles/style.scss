@@ -296,3 +296,16 @@ footer {
   height: 30px;
   margin-top: -5px;
 }
+
+// modal
+
+.modal {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  transform: translateX(-50%);
+  font-size: 45px;
+  font-weight: bold;
+  color: rgb(255, 208, 0);
+  text-shadow:  1px -4px 22px yellow, 0 0 1em red, 0 0 1.2em red;
+}

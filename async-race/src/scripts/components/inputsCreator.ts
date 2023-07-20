@@ -40,7 +40,7 @@ export class InputsCreator extends Creator {
 
     this.inputsOpt = Creator.renderElem(this.inputs, 'div', ['inputs__opt']);
     this.btnRace = Creator.renderElem(this.inputsOpt, 'div', ['btn', 'btn_race'], 'Race');
-    this.btnReset = Creator.renderElem(this.inputsOpt, 'div', ['btn', 'btn_reset'], 'Reset');
+    this.btnReset = Creator.renderElem(this.inputsOpt, 'div', ['btn', 'btn_reset', 'inactive'], 'Reset');
     this.btnGenerate = Creator.renderElem(this.inputsOpt, 'div', ['btn', 'btn_generate'], 'Generate');
 
     this.bindEvents();
@@ -51,10 +51,24 @@ export class InputsCreator extends Creator {
     this.btnCreate.addEventListener('click', () => this.createCar());
     this.btnUpdate.addEventListener('click', () => this.updateCar());
     this.btnGenerate.addEventListener('click', () => this.generateCar());
+    this.btnRace.addEventListener('click', () => this.startRace());
+    this.btnReset.addEventListener('click', () => this.resetRace());
   }
 
   private subscribeEvents(): void {
     this.emitter.subscribe<CarData>('selectCar', (data) => this.selectCar(data));
+    this.emitter.subscribe<number>('disableSelect', (id) => {
+      if (this.selectedCar?.id === id) {
+        this.inputUpdate.disabled = true;
+        this.btnUpdate.classList.add('inactive');
+      }
+    });
+    this.emitter.subscribe<number>('enableSelect', (id) => {
+      if (this.selectedCar?.id === id) {
+        this.inputUpdate.disabled = false;
+        this.btnUpdate.classList.remove('inactive');
+      }
+    });
   }
 
   private async createCar(): Promise<void> {
@@ -78,7 +92,7 @@ export class InputsCreator extends Creator {
   }
 
   private async updateCar(): Promise<void> {
-    if (this.selectedCar) {
+    if (this.selectedCar && !this.btnUpdate.classList.contains('inactive')) {
       const color = this.updateColorizer.value;
       const name = this.inputUpdate.value;
       const { id } = this.selectedCar;
@@ -98,5 +112,20 @@ export class InputsCreator extends Creator {
     const carsData = await Promise.all(promises);
 
     this.emitter.emit('generateCars', carsData);
+  }
+
+  private startRace(): void {
+    if (!this.btnRace.classList.contains('inactive')) {
+      this.btnRace.classList.add('inactive');
+      this.emitter.emit('startRace', this.btnReset);
+    }
+  }
+
+  private resetRace(): void {
+    if (!this.btnReset.classList.contains('inactive')) {
+      this.btnReset.classList.add('inactive');
+      this.btnRace.classList.remove('inactive');
+      this.emitter.emit('resetRace', null);
+    }
   }
 }

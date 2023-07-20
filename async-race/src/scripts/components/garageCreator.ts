@@ -1,8 +1,10 @@
 import { ApiQuery } from '../api/apiQuery';
+import { Race } from '../race/race';
 import { CarData } from '../types/dataTypes';
 import { CarCreator } from './carCreator';
 import { Creator } from './creator';
 import { InputsCreator } from './inputsCreator';
+import { ModalResult } from './modal';
 import { RouteCreator } from './routeCreator';
 
 export class GarageCreator extends RouteCreator {
@@ -11,10 +13,13 @@ export class GarageCreator extends RouteCreator {
   protected page = 1;
   protected quantity = 7;
 
+  private modal = new ModalResult(this.emitter);
   private inputs!: HTMLElement;
   private garage!: HTMLElement;
   protected garageTitle!: HTMLElement;
   protected pageElem!: HTMLElement;
+
+  private startedCars: CarCreator[] = [];
 
   public render(parent: HTMLElement): void {
     super.render(parent);
@@ -28,31 +33,19 @@ export class GarageCreator extends RouteCreator {
 
     ApiQuery.getAll<CarData>(this.url).then((carItems) => this.renderCars(carItems));
     this.subscribeEvents();
+
+    this.modal.render(parent);
   }
 
   protected subscribeEvents(): void {
-    this.emitter.subscribe('createCar', (carData: CarData) => {
-      this.renderCar(carData);
-    });
-
-    this.emitter.subscribe<number>('deleteCar', (id) => {
-      this.deleteCarListner(id);
-    });
-
-    this.emitter.subscribe<CarData>('updateCar', (data) => {
-      this.updateCarListner(data);
-    });
-
-    this.emitter.subscribe<CarData[]>('generateCars', (data) => {
-      this.renderCars(data);
-    });
-
-    this.emitter.subscribe<string>('nextPage', (url) => {
-      this.nextPageListner(url);
-    });
-    this.emitter.subscribe<string>('prevPage', (url) => {
-      this.prevPageListner(url);
-    });
+    this.emitter.subscribe<CarData>('createCar', (carData) => this.renderCar(carData));
+    this.emitter.subscribe<number>('deleteCar', (id) => this.deleteCarListner(id));
+    this.emitter.subscribe<CarData>('updateCar', (data) => this.updateCarListner(data));
+    this.emitter.subscribe<CarData[]>('generateCars', (data) => this.renderCars(data));
+    this.emitter.subscribe<string>('nextPage', (url) => this.nextPageListner(url));
+    this.emitter.subscribe<string>('prevPage', (url) => this.prevPageListner(url));
+    this.emitter.subscribe<HTMLElement>('startRace', (btnReset) => this.startRace(btnReset));
+    this.emitter.subscribe('resetRace', () => this.resetRace());
   }
 
   private renderCars(carData: CarData[]): void {
@@ -99,5 +92,21 @@ export class GarageCreator extends RouteCreator {
         this.prevPageListner(this.url);
       }
     }
+  }
+
+  private async startRace(btnReset: HTMLElement): Promise<void> {
+    this.startedCars = this.getActiveElems(this.elems);
+    Race.isRace = true;
+    const allStarted = this.startedCars.map((car) => car.startCar());
+    await Promise.allSettled(allStarted);
+
+    btnReset.classList.remove('inactive');
+  }
+
+  private resetRace(): void {
+    Race.isRace = false;
+    Race.isWin = false;
+    this.startedCars.forEach((car) => car.stopCar());
+    this.startedCars = [];
   }
 }
